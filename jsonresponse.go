@@ -1,8 +1,8 @@
 package httphandlers
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
 	"strconv"
 	"time"
 )
@@ -15,7 +15,7 @@ func attachJSONContentHeader(w http.ResponseWriter, b []byte) {
 func JSONResponse(w http.ResponseWriter, v interface{}) (err error) {
 	b, err := json.Marshal(v)
 	if err != nil {
-		http.Error(w, "500 JSONResponse Failed:\n" + err.Error(), http.StatusInternalServerError)
+		http.Error(w, "500 JSONResponse Failed:\n"+err.Error(), http.StatusInternalServerError)
 		return err
 	}
 	attachJSONContentHeader(w, b)
@@ -24,13 +24,13 @@ func JSONResponse(w http.ResponseWriter, v interface{}) (err error) {
 	return nil
 }
 
-func JSONResponseConditional(w http.ResponseWriter, r * http.Request, v interface{}, eTag string, modifyTime time.Time, acceptableAge time.Duration) (err error) {
+func JSONResponseConditional(w http.ResponseWriter, r *http.Request, v interface{}, eTag string, modifyTime time.Time, acceptableAge time.Duration) (err error) {
 	if ConditionalGet(w, r, eTag, modifyTime, acceptableAge) {
 		return nil
 	}
 	b, err := json.Marshal(v)
 	if err != nil {
-		http.Error(w, "500 JSONResponseConditional Failed:\n" + err.Error(), http.StatusInternalServerError)
+		http.Error(w, "500 JSONResponseConditional Failed:\n"+err.Error(), http.StatusInternalServerError)
 		return err
 	}
 	attachModificationTagHeader(w, eTag, modifyTime)

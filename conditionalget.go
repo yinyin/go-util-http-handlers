@@ -30,7 +30,7 @@ func NotModify(w http.ResponseWriter, eTag string, modifyTime time.Time) {
 //
 // The boolean true will be return if client content is updated and response is submitted.
 // Otherwise, false will be return and the caller should serving the content to client.
-func ConditionalGet(w http.ResponseWriter, r * http.Request, eTag string, modifyTime time.Time, acceptableAge time.Duration) (done bool) {
+func ConditionalGet(w http.ResponseWriter, r *http.Request, eTag string, modifyTime time.Time, acceptableAge time.Duration) (done bool) {
 	remoteETag := r.Header.Get("If-None-Match")
 	if remoteETag == eTag {
 		NotModify(w, eTag, modifyTime)

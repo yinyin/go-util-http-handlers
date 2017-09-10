@@ -1,27 +1,27 @@
 package httphandlers
 
 import (
-	"net/http"
 	"archive/zip"
-	"strings"
-	"log"
-	"os"
-	"sync"
-	"time"
 	"encoding/binary"
 	"encoding/hex"
+	"io"
+	"log"
 	"mime"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
-	"io"
+	"strings"
+	"sync"
+	"time"
 )
 
 type contentRecord struct {
-	zipFile * zip.File
-	modifyTime time.Time
-	eTag string
+	zipFile     *zip.File
+	modifyTime  time.Time
+	eTag        string
 	contentType string
-	l sync.Mutex
+	l           sync.Mutex
 }
 
 // Build ETag string from given time.
@@ -41,19 +41,19 @@ func contentTypeFromFileName(fileName string) (mimeType string) {
 	return "application/octet-stream"
 }
 
-func newContentRecordFromZipFile(zipFile * zip.File) (r * contentRecord) {
+func newContentRecordFromZipFile(zipFile *zip.File) (r *contentRecord) {
 	modifyTime := zipFile.ModTime().Truncate(time.Second)
 	eTag := makeETagFromTime(modifyTime)
 	contentType := contentTypeFromFileName(zipFile.Name)
-	return &contentRecord {
-		zipFile: zipFile,
-		modifyTime: modifyTime,
-		eTag: eTag,
+	return &contentRecord{
+		zipFile:     zipFile,
+		modifyTime:  modifyTime,
+		eTag:        eTag,
 		contentType: contentType,
 	}
 }
 
-func (r * contentRecord) openZipFileReader() (reader io.ReadCloser, contentSize int64, err error) {
+func (r *contentRecord) openZipFileReader() (reader io.ReadCloser, contentSize int64, err error) {
 	r.l.Lock()
 	defer r.l.Unlock()
 	reader, err = r.zipFile.Open()
@@ -81,9 +81,9 @@ func (r * contentRecord) openZipFileReader() (reader io.ReadCloser, contentSize 
 // In above example, if http://localhost:8080/ is requested the content will
 // be served from `web/index.html` of zip archive.
 type ZipArchiveContentServer struct {
-	fp * zip.ReadCloser
-	contentMap map[string]*contentRecord
-	contentMapLock sync.RWMutex
+	fp                 *zip.ReadCloser
+	contentMap         map[string]*contentRecord
+	contentMapLock     sync.RWMutex
 	defaultContentPath string
 }
 
@@ -93,7 +93,7 @@ type ZipArchiveContentServer struct {
 // the path of content folder inside zip archive. Empty string can be given if
 // content should be serve from root of zip archive. The defaultContentPath is
 // the path to default content with pathPrefix stripped (eg. index.html).
-func NewZipArchiveContentServer(fileName, pathPrefix, defaultContentPath string) (h * ZipArchiveContentServer, err error) {
+func NewZipArchiveContentServer(fileName, pathPrefix, defaultContentPath string) (h *ZipArchiveContentServer, err error) {
 	fp, err := zip.OpenReader(fileName)
 	if nil != err {
 		return nil, err
@@ -126,22 +126,22 @@ func NewZipArchiveContentServer(fileName, pathPrefix, defaultContentPath string)
 		}
 		contentMap[name] = newContentRecordFromZipFile(f)
 	}
-	h = &ZipArchiveContentServer {
-		fp: fp,
-		contentMap: contentMap,
+	h = &ZipArchiveContentServer{
+		fp:                 fp,
+		contentMap:         contentMap,
 		defaultContentPath: defaultContentPath,
 	}
 	return h, nil
 }
 
-func (h * ZipArchiveContentServer) lookupContent(name string) (c * contentRecord) {
+func (h *ZipArchiveContentServer) lookupContent(name string) (c *contentRecord) {
 	h.contentMapLock.RLock()
 	defer h.contentMapLock.RUnlock()
 	return h.contentMap[name]
 }
 
 // ServeHTTP fulfill the request with content in zip archive.
-func (h * ZipArchiveContentServer) ServeHTTP(w http.ResponseWriter, r * http.Request) {
+func (h *ZipArchiveContentServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimLeft(r.URL.Path, "/")
 	if "" == path {
 		path = h.defaultContentPath
@@ -151,7 +151,7 @@ func (h * ZipArchiveContentServer) ServeHTTP(w http.ResponseWriter, r * http.Req
 		http.NotFound(w, r)
 		return
 	}
-	if ConditionalGet(w, r, c.eTag, c.modifyTime, time.Second * 2) {
+	if ConditionalGet(w, r, c.eTag, c.modifyTime, time.Second*2) {
 		return
 	}
 	zipReader, contentSize, err := c.openZipFileReader()
@@ -170,7 +170,7 @@ func (h * ZipArchiveContentServer) ServeHTTP(w http.ResponseWriter, r * http.Req
 }
 
 // Close the zip archive file.
-func (h * ZipArchiveContentServer) Close() (err error) {
+func (h *ZipArchiveContentServer) Close() (err error) {
 	h.contentMapLock.Lock()
 	defer h.contentMapLock.Unlock()
 	h.contentMap = make(map[string]*contentRecord)
