@@ -14,6 +14,9 @@ func attachJSONContentHeader(w http.ResponseWriter, b []byte) {
 
 // JSONResponse generate JSON response based on given `v`. The JSON is encoded
 // with `encoding/json` package.
+//
+// ** CAUTION ** :
+// This function does not handles HEAD method. JSON content body always responded.
 func JSONResponse(w http.ResponseWriter, v interface{}) (err error) {
 	b, err := json.Marshal(v)
 	if err != nil {
