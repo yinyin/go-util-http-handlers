@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Attach content modification related headers.
+// attachModificationTagHeader attach content modification related headers.
 // Headers attached includes: ETag and Last-Modified.
 func attachModificationTagHeader(w http.ResponseWriter, eTag string, modifyTime time.Time) {
 	httpModifyTime := modifyTime.UTC().Format(http.TimeFormat)
@@ -13,8 +13,8 @@ func attachModificationTagHeader(w http.ResponseWriter, eTag string, modifyTime 
 	w.Header().Set("Last-Modified", httpModifyTime)
 }
 
-// Replies to the request with 304 Not Modified to indicate that the requested
-// content is not modified since last request.
+// NotModify replies to the request with 304 Not Modified to indicate that the
+// requested content is not modified since last request.
 //
 // The parameters eTag and modifyTime are ETag and modification time of content
 // which will be attached to response headers.
@@ -23,8 +23,10 @@ func NotModify(w http.ResponseWriter, eTag string, modifyTime time.Time) {
 	http.Error(w, "304 Not Modified", http.StatusNotModified)
 }
 
-// Perform conditional-get on request r. The "If-None-Match" and "If-Modified-Since" headers
-// will be extracted from request to compare with given ETag eTag and modification time modifyTime.
+// ConditionalGet perform conditional-get on request r. The "If-None-Match" and
+// "If-Modified-Since" headers will be extracted from request to compare with
+// given ETag eTag and modification time modifyTime.
+//
 // A time.Duration acceptableAge is passed in for acceptable time difference on
 // modification time comparision.
 //

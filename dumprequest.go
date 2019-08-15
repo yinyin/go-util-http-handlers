@@ -100,8 +100,8 @@ func newRequestDataWrap(d *http.Request) (r *requestDataWrap) {
 type dumpRequestHandler struct {
 }
 
-// Create a handler which dumps request to response. The result will be text
-// or JSON depends on request path.
+// NewDumpRequestHandler create a handler which dumps request to response.
+// The result will be text or JSON depends on request path.
 //
 // The response will be plain text in default. If the first part of path
 // is `/json` (eg: /json/test...) the response will given in JSON.
