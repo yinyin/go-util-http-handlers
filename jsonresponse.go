@@ -22,7 +22,6 @@ func JSONResponse(w http.ResponseWriter, v interface{}) (err error) {
 	}
 	attachJSONContentHeader(w, b)
 	w.WriteHeader(http.StatusOK)
-	w.Write(b)
 	return nil
 }
 
@@ -40,6 +39,8 @@ func JSONResponseConditional(w http.ResponseWriter, r *http.Request, v interface
 	attachModificationTagHeader(w, eTag, modifyTime)
 	attachJSONContentHeader(w, b)
 	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+	if r.Method != http.MethodHead {
+		w.Write(b)
+	}
 	return nil
 }

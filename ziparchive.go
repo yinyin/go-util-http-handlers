@@ -164,6 +164,9 @@ func (h *ZipArchiveContentServer) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Content-Type", c.contentType)
 	w.Header().Set("Content-Length", strconv.FormatInt(contentSize, 10))
 	w.WriteHeader(http.StatusOK)
+	if r.Method == http.MethodHead {
+		return
+	}
 	if written, err := io.CopyN(w, zipReader, contentSize); nil != err {
 		log.Printf("ZipArchiveContentServer.ServeHTTP: failed on sending zip content to remote: %v (written=%v)", err, written)
 	}

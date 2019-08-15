@@ -115,7 +115,9 @@ func (h *dumpRequestHandler) serveJSON(w http.ResponseWriter, r *http.Request) {
 
 func (h *dumpRequestHandler) serveText(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
-
+	if r.Method == http.MethodHead {
+		return
+	}
 	fmt.Fprintf(w, "Method: %v\n", r.Method)
 	fmt.Fprintf(w, "URL: (%v)\n", r.URL)
 	fmt.Fprintf(w, "    Scheme: %v\n", r.URL.Scheme)
