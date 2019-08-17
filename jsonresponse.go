@@ -25,6 +25,7 @@ func JSONResponse(w http.ResponseWriter, v interface{}) (err error) {
 	}
 	attachJSONContentHeader(w, b)
 	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 	return nil
 }
 
