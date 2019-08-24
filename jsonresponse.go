@@ -29,6 +29,22 @@ func JSONResponse(w http.ResponseWriter, v interface{}) (err error) {
 	return nil
 }
 
+// JSONResponseWithStatusCode similar to JSONResponse but with given
+// statusCode and no-cache headers enabled.
+func JSONResponseWithStatusCode(w http.ResponseWriter, v interface{}, statusCode int) (err error) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		http.Error(w, "500 JSONResponseWithStatusCode Failed:\n"+err.Error(), http.StatusInternalServerError)
+		return err
+	}
+	attachJSONContentHeader(w, b)
+	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Pragma", "no-cache")
+	w.WriteHeader(statusCode)
+	w.Write(b)
+	return nil
+}
+
 // JSONResponseConditional generate JSON response based on given `v` and handle
 // conditional GET request. The JSON is encoded with `encoding/json` package.
 func JSONResponseConditional(w http.ResponseWriter, r *http.Request, v interface{}, eTag string, modifyTime time.Time, acceptableAge time.Duration) (err error) {
