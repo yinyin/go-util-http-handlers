@@ -4,6 +4,11 @@ import (
 	"net/http"
 )
 
+// JSONResponseWithStatusOK is shortcut of JSONResponseWithStatusCode(w, v, http.StatusOK) call.
+func JSONResponseWithStatusOK(w http.ResponseWriter, v interface{}) (err error) {
+	return JSONResponseWithStatusCode(w, v, http.StatusOK)
+}
+
 // JSONResponseWithStatusBadRequest is shortcut of JSONResponseWithStatusCode(w, v, http.StatusBadRequest) call.
 func JSONResponseWithStatusBadRequest(w http.ResponseWriter, v interface{}) (err error) {
 	return JSONResponseWithStatusCode(w, v, http.StatusBadRequest)
