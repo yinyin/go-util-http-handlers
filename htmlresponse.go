@@ -15,7 +15,7 @@ func attachUTF8HTMLContentHeader(w http.ResponseWriter, htmlContent []byte) {
 // must encoded with UTF-8 charset. The no-cache headers enabled.
 func UTF8HTMLResponseWithStatusCode(w http.ResponseWriter, htmlContent []byte, statusCode int) (err error) {
 	attachUTF8HTMLContentHeader(w, htmlContent)
-	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Cache-Control", "no-cache, private")
 	w.Header().Set("Pragma", "no-cache")
 	w.WriteHeader(statusCode)
 	w.Write(htmlContent)

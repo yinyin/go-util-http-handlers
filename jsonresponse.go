@@ -38,7 +38,7 @@ func JSONResponseWithStatusCode(w http.ResponseWriter, v interface{}, statusCode
 		return err
 	}
 	attachJSONContentHeader(w, b)
-	w.Header().Set("Cache-Control", "no-store")
+	w.Header().Set("Cache-Control", "no-cache, private")
 	w.Header().Set("Pragma", "no-cache")
 	w.WriteHeader(statusCode)
 	w.Write(b)
