@@ -35,14 +35,14 @@ func makeETagFromTime(t time.Time) (eTag string) {
 // Get content type from file extension.
 // MIME type application/octet-stream will be applied if failed to guess from file extension.
 func contentTypeFromFileName(fileName string) (mimeType string) {
-	if ctype := mime.TypeByExtension(filepath.Ext(fileName)); "" != ctype {
+	if ctype := mime.TypeByExtension(filepath.Ext(fileName)); ctype != "" {
 		return ctype
 	}
 	return "application/octet-stream"
 }
 
 func newContentRecordFromZipFile(zipFile *zip.File) (r *contentRecord) {
-	modifyTime := zipFile.ModTime().Truncate(time.Second)
+	modifyTime := zipFile.Modified.Truncate(time.Second)
 	eTag := makeETagFromTime(modifyTime)
 	contentType := contentTypeFromFileName(zipFile.Name)
 	return &contentRecord{
@@ -101,14 +101,14 @@ func NewZipArchiveContentServer(fileName, pathPrefix, defaultContentPath string)
 	contentMap := make(map[string]*contentRecord)
 	pathPrefix = strings.Trim(pathPrefix, "/")
 	doPrefixCheck := false
-	if "" != pathPrefix {
+	if pathPrefix != "" {
 		pathPrefix = pathPrefix + "/"
 		doPrefixCheck = true
 	}
 	defaultContentPath = strings.Trim(defaultContentPath, "/")
 	for _, f := range fp.File {
 		mode := f.Mode()
-		if 0 != (mode & os.ModeType) {
+		if (mode & os.ModeType) != 0 {
 			// not regular file
 			continue
 		}
@@ -143,7 +143,7 @@ func (h *ZipArchiveContentServer) lookupContent(name string) (c *contentRecord) 
 // ServeHTTP fulfill the request with content in zip archive.
 func (h *ZipArchiveContentServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimLeft(r.URL.Path, "/")
-	if "" == path {
+	if path == "" {
 		path = h.defaultContentPath
 	}
 	c := h.lookupContent(path)

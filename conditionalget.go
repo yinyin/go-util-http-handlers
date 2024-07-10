@@ -39,7 +39,7 @@ func ConditionalGet(w http.ResponseWriter, r *http.Request, eTag string, modifyT
 		return true
 	}
 	remoteModifyTimeText := r.Header.Get("If-Modified-Since")
-	if "" != remoteModifyTimeText {
+	if remoteModifyTimeText != "" {
 		if remoteModifyTime, err := http.ParseTime(remoteModifyTimeText); nil == err {
 			if modifyTime.Before(remoteModifyTime.Add(acceptableAge)) {
 				NotModify(w, eTag, modifyTime)
